@@ -4,6 +4,7 @@ Sub KopiujZTransakcji()
     Dim ArkuszTransakcje As Worksheet
     Dim OstatniWiersz As Long
     Dim Cel As Range
+    Dim Wiersz As Long
     
     ' Ustal wartość do wyszukania w komórce A2 na Arkusz1
     Set Arkusz1 = ThisWorkbook.Sheets("Arkusz1")
@@ -19,18 +20,17 @@ Sub KopiujZTransakcji()
     Set Cel = Arkusz1.Range("D2")
     
     ' Przeszukaj kolumnę B w arkuszu "Transakcje" i skopiuj wartość z kolumny BU do komórki D2 na Arkusz1
+    Wiersz = 2 ' Zmienna do śledzenia wiersza na Arkusz1
+    
     For i = 1 To OstatniWiersz
         If ArkuszTransakcje.Cells(i, "B").Value = Wartosc Then
             ' Skopiuj wartość z kolumny BU
             Cel.Value = ArkuszTransakcje.Cells(i, "BU").Value
-            
-            ' Przesuń się do następnego wiersza z jednym pustym wierszem
-            Set Cel = Cel.Offset(2, 0)
+            Wiersz = Wiersz + 2 ' Przesuń się do następnego wiersza z jednym pustym wierszem
+            Set Cel = Arkusz1.Cells(Wiersz, "D") ' Ustal nową komórkę docelową
         End If
     Next i
     
-    ' Jeśli nie znaleziono wartości, wyświetl komunikat
-    If IsEmpty(Arkusz1.Range("D2").Value) Then
-        MsgBox "Wartość nie została znaleziona w kolumnie B na arkuszu 'Transakcje'."
-    End If
+    ' Usuń wiersze z pustymi komórkami w kolumnie D na Arkusz1
+    Arkusz1.Columns("D").SpecialCells(xlCellTypeBlanks).EntireRow.Delete
 End Sub
