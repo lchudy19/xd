@@ -1,6 +1,52 @@
-gbebrgkkrgwmw;eknmbgwv
-bwklnf ebv
-vwnlkefmb
-wre;lbm
+Sub FiltrujIKopiuj()
+    Dim Wartosc As Variant
+    Dim Arkusz1 As Worksheet
+    Dim ArkuszTransakcje As Worksheet
+    Dim ZnalezionaKomorka As Range
+    
+    ' Ustal wartość do wyszukania w komórce A2 na Arkuszu1
+    Set Arkusz1 = ThisWorkbook.Sheets("Arkusz1")
+    Wartosc = Arkusz1.Range("A2").Value
+    
+    ' Ustal arkusz "Transakcje" w skoroszycie
+    Set ArkuszTransakcje = ThisWorkbook.Sheets("Transakcje")
+    
+    ' Znajdź pierwsze pasujące wystąpienie wartości w kolumnie B na arkuszu "Transakcje"
+    On Error Resume Next
+    Set ZnalezionaKomorka = ArkuszTransakcje.Columns("B").Find(What:=Wartosc, LookIn:=xlValues, LookAt:=xlWhole)
+    On Error GoTo 0
+    
+    ' Jeśli wartość została znaleziona, skopiuj wartość z kolumny BU do komórki D2 na Arkusz1
+    If Not ZnalezionaKomorka Is Nothing Then
+        Arkusz1.Range("D2").Value = ZnalezionaKomorka.Offset(0, 54).Value ' Kolumna BU to 54 kolumny od kolumny B
+    Else
+        MsgBox "Wartość nie została znaleziona w kolumnie B na arkuszu 'Transakcje'."
+    End If
+End Sub
 
-gtigkjtv
+
+
+Sub PrzeniesTekstDoKolumnyD()
+    Dim Tekst As String
+    Dim Cel As Range
+    Dim Wiersz As Integer
+    
+    ' Pobierz tekst z komórki A2
+    Tekst = Sheets("Arkusz1").Range("A2").Value
+    
+    ' Ustal, w którym wierszu rozpocząć wklejanie tekstu do kolumny D
+    Wiersz = 1
+    
+    ' Przesuń się na ostatni wiersz w kolumnie D
+    Set Cel = Sheets("Arkusz1").Cells(Sheets("Arkusz1").Rows.Count, "D").End(xlUp).Offset(1, 0)
+    
+    ' Podziel tekst na osobne wiersze
+    Dim TekstArray() As String
+    TekstArray = Split(Tekst, vbCrLf)
+    
+    ' Wklej każdą część tekstu do kolejnych wierszy w kolumnie D
+    For Each Fragment In TekstArray
+        Cel.Offset(Wiersz - 1, 0).Value = Fragment
+        Wiersz = Wiersz + 1
+    Next Fragment
+End Sub
